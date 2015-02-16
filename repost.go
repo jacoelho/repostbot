@@ -16,12 +16,19 @@ type WebhookResponse struct {
   Text     string `json:"text"`
 }
 
-var (
-  urlreg *regexp.Regexp
-)
+type UrlWatcher struct {
+  urlRegex *regexp.Regexp
+  urlCache *lru.Cache
+}
+
+func NewUrlWatcher() (*UrlWatcher)
+{
+
+}
 
 func init() {
-    urlreg = regexp.MustCompile(`<(https?([^\||>]*))>`)
+    urlRegex = regexp.MustCompile(`<(https?([^\||>]*))>`)
+    urlCache, _  = lru.New(20)
 }
 
 func webHookHandler(w http.ResponseWriter, r *http.Request) {
