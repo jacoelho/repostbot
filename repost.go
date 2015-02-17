@@ -47,8 +47,8 @@ func webHookHandler(w http.ResponseWriter, r *http.Request) {
   for _, url := range urls {
     log.Printf("Checking %s", url)
 
-    raw, ok := urlCache.Get(url)
-    if ok {
+    raw, repost := urlCache.Get(url)
+    if repost {
       t1, _  := time.Parse(time.RFC3339,raw.(string)) 
       log.Printf("[REPOST] Posted %s ago", time.Since(t1))
     }
