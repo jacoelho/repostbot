@@ -1,11 +1,11 @@
 package main
 
 import (
-  "fmt"
-  "io/ioutil"
+//  "fmt"
+//  "io/ioutil"
   "net/http"
-  "net/url"
-  "encoding/json"
+//  "net/url"
+//  "encoding/json"
   "regexp"
   "github.com/hashicorp/golang-lru"
   "log"
@@ -16,25 +16,51 @@ type WebhookResponse struct {
   Text     string `json:"text"`
 }
 
-type UrlWatcher struct {
+var (
   urlRegex *regexp.Regexp
   urlCache *lru.Cache
-}
-
-func NewUrlWatcher() (*UrlWatcher)
-{
-
-}
+)
 
 func init() {
     urlRegex = regexp.MustCompile(`<(https?([^\||>]*))>`)
     urlCache, _  = lru.New(20)
 }
 
+func urlMatcher(s string) (urls []string) {
+     matches := urlRegex.FindAllStringSubmatch(s, -1)
+     
+     for _, match := range matches {
+         if match[1] != "" {
+	    urls = append(urls, match[1])
+	 }
+     }
+
+     return
+}
+
 func webHookHandler(w http.ResponseWriter, r *http.Request) {
-  incomingText := r.PostFormValue("text")
+  r.ParseForm()
+  log.Println(r.Form)
+
+  for key, _ := range r.Form {
+    log.Println(key)
+  }
+
+  incomingText := r.FormValue("text")
+  log.Printf("cenas: %d", len(incomingText))
   log.Printf("Handling incoming request: %s", incomingText)
 
+  urls := urlMatcher(incomingText)
+  
+  for _, url := range urls {
+    _, ok := urlCache.Get(url)
+    if ok {
+      log.Printf("cenas")
+    } else {
+      log.Printf("cenas2")
+      urlCache.Add(url, "2")
+    }
+  }
 }
 
 func main() {
