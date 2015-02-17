@@ -7,12 +7,18 @@ import (
   "github.com/hashicorp/golang-lru"
   "log"
   "time"
+  "os"
+  "strconv"
 )
 
 type WebhookResponse struct {
   Username string `json:"username"`
   Text     string `json:"text"`
 }
+
+const (
+ CacheDefaultSize = 20
+)
 
 var (
   urlRegex *regexp.Regexp
@@ -21,7 +27,6 @@ var (
 
 func init() {
    urlRegex = regexp.MustCompile(`<(https?([^\||>]*))(\||>)`)
-   urlCache, _  = lru.New(20)
 }
 
 func urlMatcher(s string) (urls []string) {
@@ -33,10 +38,6 @@ func urlMatcher(s string) (urls []string) {
 
      return
 }
-
-//func urlCheck(s string) (url string) {
-//  response, err := http.Get(url)
-//}
 
 func webHookHandler(w http.ResponseWriter, r *http.Request) {
   incomingText := r.PostFormValue("text")
@@ -59,6 +60,21 @@ func webHookHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+  port := os.Getenv("PORT")
+  if port == "" {
+    log.Fatal("define PORT")
+  }
+  
+  cacheSize, err := strconv.Atoi(os.Getenv("CACHE_SIZE"))
+  if err != nil || cacheSize <= 0 {
+    cacheSize = CacheDefaultSize
+  }
+
+  urlCache, _  = lru.New(cacheSize)
+
   http.HandleFunc("/", webHookHandler)
-  http.ListenAndServe(":8080", nil)
+  err = http.ListenAndServe(":" + port , nil)
+  if err != nil {
+    log.Fatal(err)
+  }
 }
