@@ -41,8 +41,11 @@ func urlMatcher(s string) (urls []string) {
 }
 
 func webHookHandler(w http.ResponseWriter, r *http.Request) {
+  _ = r.ParseForm()
+  log.Printf("%s", r.Form)
+
   incomingText := r.PostFormValue("text")
-  
+
   // avoid feedback
   if r.PostFormValue("user_id") == "RepostBOT" {
     return
