@@ -2,7 +2,7 @@ package main
 
 import (
   "net/http"
-//  "encoding/json"
+  "encoding/json"
   "regexp"
   "log"
   "time"
@@ -55,6 +55,15 @@ func webHookHandler(w http.ResponseWriter, r *http.Request) {
     if repost {
       t1, _  := time.Parse(time.RFC3339,raw.(string))
       log.Printf("[REPOST] Posted %s ago", time.Since(t1))
+
+      var response WebhookResponse
+      response.Username = botUserName
+      response.Text = "http://i.imgur.com/YndMSe5.png"
+      b, err := json.Marshal(response)
+      if err != nil {
+        log.Fatal(err)
+      }
+      w.Write(b)
     }
 
     t := time.Now()
