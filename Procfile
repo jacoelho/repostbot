@@ -1,1 +1,1 @@
-web: PORT=8080 BOTNAME=repostbot repostbot
+web: BOTNAME=repostbot repostbot
