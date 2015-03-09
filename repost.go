@@ -2,7 +2,7 @@ package main
 
 import (
   "net/http"
-  "encoding/json"
+//  "encoding/json"
   "regexp"
   "log"
   "time"
@@ -17,15 +17,15 @@ type WebhookResponse struct {
 }
 
 const (
- CacheDefaultSize = 20
- PortDefault = "8080"
- BotNameDefault = "RepostBOT"
+  CacheDefaultSize = 20
+  PortDefault = "8080"
+  BotNameDefault = "RepostBOT"
 )
 
 var (
   urlRegex *regexp.Regexp
   urlCache *lru.Cache
-  string botUserName
+  botUserName string
 )
 
 func init() {
