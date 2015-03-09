@@ -44,7 +44,7 @@ func webHookHandler(w http.ResponseWriter, r *http.Request) {
   incomingText := r.PostFormValue("text")
   
   // avoid feedback
-  if r.PostFormValue("user_name") == "RepostBOT" {
+  if r.PostFormValue("user_id") == "RepostBOT" {
     return
   }
   
