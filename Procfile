@@ -1,1 +1,1 @@
-web: BOTNAME=repostbot repostbot
+web: repostbot
