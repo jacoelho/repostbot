@@ -62,7 +62,7 @@ func webHookHandler(w http.ResponseWriter, r *http.Request) {
 
       var response WebhookResponse
       response.Username = "RepostBOT"
-      response.Text = "http://i.imgur.com/YndMSe5.png"
+      response.Text = "Repost!!!!"
       b, _ := json.Marshal(response)
       w.Write(b)
     }
