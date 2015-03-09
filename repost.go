@@ -19,13 +19,11 @@ type WebhookResponse struct {
 const (
   CacheDefaultSize = 20
   PortDefault = "8080"
-  BotNameDefault = "RepostBOT"
 )
 
 var (
   urlRegex *regexp.Regexp
   urlCache *lru.Cache
-  botUserName string
 )
 
 func init() {
@@ -44,6 +42,12 @@ func urlMatcher(s string) (urls []string) {
 
 func webHookHandler(w http.ResponseWriter, r *http.Request) {
   incomingText := r.PostFormValue("text")
+  
+  // avoid feedback
+  if r.PostFormValue("user_name") == "RepostBOT" {
+    return
+  }
+  
   log.Printf("Handling incoming request: %s", incomingText)
 
   urls := urlMatcher(incomingText)
@@ -57,12 +61,9 @@ func webHookHandler(w http.ResponseWriter, r *http.Request) {
       log.Printf("[REPOST] Posted %s ago", time.Since(t1))
 
       var response WebhookResponse
-      response.Username = botUserName
+      response.Username = "RepostBOT"
       response.Text = "http://i.imgur.com/YndMSe5.png"
-      b, err := json.Marshal(response)
-      if err != nil {
-        log.Fatal(err)
-      }
+      b, _ := json.Marshal(response)
       w.Write(b)
     }
 
@@ -76,12 +77,7 @@ func main() {
   if port == "" {
     port = PortDefault
   }
-
-  botUserName := os.Getenv("BOTNAME")
-  if botUserName == "" {
-    botUserName = BotNameDefault
-  }
-
+  
   cacheSize, err := strconv.Atoi(os.Getenv("CACHE_SIZE"))
   if err != nil || cacheSize <= 0 {
     cacheSize = CacheDefaultSize
